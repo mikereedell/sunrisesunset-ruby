@@ -1,82 +1,76 @@
 require 'sunrise'
 
-describe SolarEventCalculator, "sunrise longitude hour for 01 Nov 2008 @home" do
-  it "returns correct longitude hour" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_rise_longitude_hour.should eql(BigDecimal.new("306.4605"))
-  end
-end
+describe SolarEventCalculator, "test the math for home" do
 
-describe SolarEventCalculator, "sunset longitude hour for 01 Nov 2008 @home" do
-  it "returns correct longitude hour" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_set_longitude_hour.should eql(BigDecimal.new("306.9605"))
+  before do
+    @date = Date.parse('2008-11-01') #01 November 2008
+    @calc = SolarEventCalculator.new(@date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
   end
-end
 
-describe SolarEventCalculator, "sunrise mean anomaly" do
+  it "returns correct longitude hour" do
+    @calc.compute_longitude_hour.should eql(BigDecimal.new("-5.0523"))
+  end
+
+  it "returns correct longitude hour" do
+    @calc.compute_rise_longitude_hour.should eql(BigDecimal.new("306.4605"))
+  end
+
+  it "returns correct longitude hour" do
+    @calc.compute_set_longitude_hour.should eql(BigDecimal.new("306.9605"))
+  end
+
   it "returns correct sunrise mean anomaly" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_sun_mean_anomaly(BigDecimal.new("306.4605")).should eql(BigDecimal.new("298.7585"))
+    @calc.compute_sun_mean_anomaly(BigDecimal.new("306.4605")).should eql(BigDecimal.new("298.7585"))
   end
-end
 
-describe SolarEventCalculator, "sunrise sun true longitude" do
   it "returns correct sunrise's sun true longitude" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_sun_true_longitude(BigDecimal.new("298.7585")).should eql(BigDecimal.new("219.6960"))
+    @calc.compute_sun_true_longitude(BigDecimal.new("298.7585")).should eql(BigDecimal.new("219.6960"))
   end
-end
 
-describe SolarEventCalculator, "sunrise right ascension" do
   it "returns correct sunrise's right ascension" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_right_ascension(BigDecimal.new("219.6960")).should eql(BigDecimal.new("37.2977"))
+    @calc.compute_right_ascension(BigDecimal.new("219.6960")).should eql(BigDecimal.new("37.2977"))
   end
-end
 
-describe SolarEventCalculator, "sunrise right ascension in correct quadrant" do
   it "returns correct sunrise's right ascension quadrant" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.put_ra_in_correct_quadrant(BigDecimal.new("219.6960")).should eql(BigDecimal.new("14.4865"))
+    @calc.put_ra_in_correct_quadrant(BigDecimal.new("219.6960")).should eql(BigDecimal.new("14.4865"))
   end
-end
 
-describe SolarEventCalculator, "sunrise sin sun declination" do
   it "returns correct sunrise sin sun declination" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_sin_sun_declination(BigDecimal.new("219.6960")).should eql(BigDecimal.new("-0.2541"))
+    @calc.compute_sin_sun_declination(BigDecimal.new("219.6960")).should eql(BigDecimal.new("-0.2541"))
   end
-end
 
-describe SolarEventCalculator, "sunrise cosine sun declination" do
   it "returns correct sunrise cosine sun declination" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_cosine_sun_declination(BigDecimal.new("-0.2541")).should eql(BigDecimal.new("0.9672"))
+    @calc.compute_cosine_sun_declination(BigDecimal.new("-0.2541")).should eql(BigDecimal.new("0.9672"))
   end
-end
 
-describe SolarEventCalculator, "sunrise cosine sun local hour" do
   it "returns correct sunrise cosine sun local hour" do
-    date = Date.parse('2008-11-01')
-    calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-    calc.compute_cosine_sun_local_hour(BigDecimal.new("219.6960"), 96).should eql(BigDecimal.new("0.0791"))
+    @calc.compute_cosine_sun_local_hour(BigDecimal.new("219.6960"), 96).should eql(BigDecimal.new("0.0791"))
+  end
+
+  it "returns correct sunrise local hour angle" do
+    @calc.compute_local_hour_angle(BigDecimal.new("0.0791")).should eql(BigDecimal.new("18.3025"))
+  end
+
+  it "returns correct sunrise local mean time" do
+    trueLong = BigDecimal.new("219.6960")
+    longHour = BigDecimal.new("-5.0523")
+    localHour = BigDecimal.new("18.3025")
+    @calc.compute_local_mean_time(trueLong, longHour, localHour).should eql(BigDecimal.new("11.0818"))
+  end
+
+  it "returns correct time" do
+    @calc.compute_utc_sunrise(96).should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 4))
   end
 end
 
+describe SolarEventCalculator, "test the math for areas where there could be no rise/set" do
 
-# describe SolarEventCalculator, "sunrise time for 01 Nov 2009 @home" do
-#   it "returns correct time" do
-#     date = Date.parse('2008-11-01')
-#     calc = SolarEventCalculator.new(date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
-#     calc.compute_utc_sunrise(96).should eql("Sun Nov 01 11:05:00 UTC 2009")
-#   end
-# end
+  it "returns correct time" do
+    date = Date.parse('2008-04-25') #25 April 2008
+    calc = SolarEventCalculator.new(date, BigDecimal.new("64.8378"), BigDecimal.new("-147.7164"))
+    calc.compute_utc_sunrise(108).should eql(nil)
+  end
+
+  # 4/25/2008,99:99,99:99,04:29,05:36,22:03,23:11,99:99,99:99
+end
+

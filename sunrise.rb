@@ -15,6 +15,7 @@ class SolarEventCalculator
 
   def compute_longitude_hour
     lngHour = @longitude / BigDecimal.new("15")
+    lngHour.round(4)
   end
 
   def compute_rise_longitude_hour
@@ -85,9 +86,10 @@ class SolarEventCalculator
   end
 
   def compute_local_hour_angle(cosSunLocalHour)
-    acosH = Math.acos(cosSunLocalHour)
+    acosH = BigDecimal.new(Math.acos(cosSunLocalHour).to_s)
     localHourAngle = BigDecimal.new("360") - rads_as_degrees(acosH)
     localHourAngle = localHourAngle / BigDecimal.new("15")
+    localHourAngle.round(4)
   end
 
   def compute_set_local_hour_angle
@@ -104,25 +106,30 @@ class SolarEventCalculator
     time = h + ra - parens - BigDecimal.new("6.622")
 
     utcTime = time - longHour
+    utcTime = put_in_range(utcTime, 0, 24, 24)
+    utcTime.round(4)
   end
 
   def compute_utc_sunrise(zenith)
     longHour = compute_longitude_hour
+    riseLongHour = compute_rise_longitude_hour
 
-    meanAnomaly = compute_sun_mean_anomaly(longHour)
+    meanAnomaly = compute_sun_mean_anomaly(riseLongHour)
     sunTrueLong = compute_sun_true_longitude(meanAnomaly)
     cosineSunLocalHour = compute_cosine_sun_local_hour(sunTrueLong, zenith)
 
-    #put logic here for handling when sun doesn't rise/set.
+    if(cosineSunLocalHour > BigDecimal.new("1") || cosineSunLocalHour < BigDecimal.new("-1"))
+      return nil
+    end
 
     sunLocalHour = compute_local_hour_angle(cosineSunLocalHour)
     localMeanTime = compute_local_mean_time(sunTrueLong, longHour, sunLocalHour)
 
-    timeParts = localMeanTime.to_s.split('.')
+    timeParts = localMeanTime.to_s('F').split('.')
     mins = BigDecimal.new("." + timeParts[1]) * BigDecimal.new("60")
     mins = mins.truncate()
-
     hours = timeParts[0]
+
     Time.gm(@date.year, @date.mon, @date.mday, hours, pad_minutes(mins.to_i))
   end
 
