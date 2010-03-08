@@ -1,6 +1,7 @@
 = Ruby Sunrise
 
-*
+* http://rubygems.org/gems/RubySunrise
+* http://github.com/mikereedell/sunrisesunset-ruby
 
 == DESCRIPTION:
 
@@ -17,7 +18,7 @@ None.
 
 == INSTALL:
 
-gem install rubysunrise
+gem install RubySunrise
 
 == LICENSE:
 
