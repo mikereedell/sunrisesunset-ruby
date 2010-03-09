@@ -1,4 +1,4 @@
-require 'sunrise'
+require '../lib/solareventcalculator'
 
 describe SolarEventCalculator, "Test the sunset algorithm" do
 
@@ -8,11 +8,11 @@ describe SolarEventCalculator, "Test the sunset algorithm" do
   end
 
   it "returns correct longitude hour" do
-    @calc.compute_longitude_hour.should eql(BigDecimal.new("-5.0523"))
+    @calc.compute_lnghour.should eql(BigDecimal.new("-5.0523"))
   end
 
   it "returns correct longitude hour" do
-    @calc.compute_set_longitude_hour.should eql(BigDecimal.new("306.9605"))
+    @calc.compute_longitude_hour(false).should eql(BigDecimal.new("306.9605"))
   end
 
   it "returns correct sunset mean anomaly" do
@@ -44,7 +44,7 @@ describe SolarEventCalculator, "Test the sunset algorithm" do
   end
 
   it "returns correct sunset local hour angle" do
-    @calc.compute_sunset_local_hour_angle(BigDecimal.new("0.0815")).should eql(BigDecimal.new("5.6883"))
+    @calc.compute_local_hour_angle(BigDecimal.new("0.0815"), false).should eql(BigDecimal.new("5.6883"))
   end
 
   it "returns correct sunset local mean time" do
@@ -56,19 +56,19 @@ describe SolarEventCalculator, "Test the sunset algorithm" do
   end
 
   it "returns correct civil sunset time" do
-    @calc.compute_utc_sunset(96).should eql(Time.gm(@date.year, @date.mon, @date.mday, 22, 28))
+    @calc.compute_utc_civil_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 22, 28))
   end
 
   it "returns correct official sunset time" do
-    @calc.compute_utc_sunset(90.8333).should eql(Time.gm(@date.year, @date.mon, @date.mday, 21, 59))
+    @calc.compute_utc_official_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 21, 59))
   end
 
   it "returns correct nautical sunset time" do
-    @calc.compute_utc_sunset(102).should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 0))
+    @calc.compute_utc_nautical_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 0))
   end
 
   it "returns correct astronomical sunset time" do
-    @calc.compute_utc_sunset(108).should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 31))
+    @calc.compute_utc_astronomical_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 31))
   end
 end
 
@@ -77,13 +77,12 @@ describe SolarEventCalculator, "test the math for areas where the sun doesn't se
   it "returns correct time" do
     date = Date.parse('2008-04-25') #25 April 2008
     calc = SolarEventCalculator.new(date, BigDecimal.new("64.8378"), BigDecimal.new("-147.7164"))
-    calc.compute_utc_sunset(108).should eql(nil)
+    calc.compute_utc_nautical_sunset.should eql(nil)
   end
 
   it "returns correct time" do
     date = Date.parse('2008-04-25') #25 April 2008
     calc = SolarEventCalculator.new(date, BigDecimal.new("64.8378"), BigDecimal.new("-147.7164"))
-    calc.compute_utc_sunset(102).should eql(nil)
+    calc.compute_utc_nautical_sunset.should eql(nil)
   end
 end
-

@@ -13,18 +13,14 @@ class SolarEventCalculator
     @longitude = longitude
   end
 
-  def compute_longitude_hour
+  def compute_lnghour
     lngHour = @longitude / BigDecimal.new("15")
     lngHour.round(4)
   end
 
-  def compute_rise_longitude_hour
-    longHour = @date.yday + ((BigDecimal.new("6") - compute_longitude_hour) / BigDecimal.new("24"))
-    longHour.round(4)
-  end
-
-  def compute_set_longitude_hour
-    longHour = @date.yday + ((BigDecimal.new("18") - compute_longitude_hour) / BigDecimal.new("24"))
+  def compute_longitude_hour(isSunrise)
+    minuend = (isSunrise) ? BigDecimal.new("6") : BigDecimal.new("18")
+    longHour = @date.yday + ((minuend - compute_lnghour) / BigDecimal.new("24"))
     longHour.round(4)
   end
 
@@ -85,17 +81,12 @@ class SolarEventCalculator
     cosLocalHour.round(4)
   end
 
-  def compute_sunrise_local_hour_angle(cosSunLocalHour)
+  def compute_local_hour_angle(cosSunLocalHour, isSunrise)
     acosH = BigDecimal.new(Math.acos(cosSunLocalHour).to_s)
-    localHourAngle = BigDecimal.new("360") - rads_as_degrees(acosH)
-    localHourAngle = localHourAngle / BigDecimal.new("15")
-    localHourAngle.round(4)
-  end
+    acosHDegrees = rads_as_degrees(acosH)
 
-  def compute_sunset_local_hour_angle(cosSunLocalHour)
-    acosH = BigDecimal.new(Math.acos(cosSunLocalHour).to_s)
-    acosH = rads_as_degrees(acosH)
-    localHourAngle = acosH / BigDecimal.new("15")
+    localHourAngle = (isSunrise) ? BigDecimal.new("360") - acosHDegrees : acosHDegrees
+    localHourAngle = localHourAngle / BigDecimal.new("15")
     localHourAngle.round(4)
   end
 
@@ -111,11 +102,11 @@ class SolarEventCalculator
     utcTime.round(4)
   end
 
-  def compute_utc_sunrise(zenith)
-    longHour = compute_longitude_hour
-    riseLongHour = compute_rise_longitude_hour
+  def compute_utc_solar_event(zenith, isSunrise)
+    longHour = compute_lnghour
+    eventLongHour = compute_longitude_hour(isSunrise)
 
-    meanAnomaly = compute_sun_mean_anomaly(riseLongHour)
+    meanAnomaly = compute_sun_mean_anomaly(eventLongHour)
     sunTrueLong = compute_sun_true_longitude(meanAnomaly)
     cosineSunLocalHour = compute_cosine_sun_local_hour(sunTrueLong, zenith)
 
@@ -123,8 +114,8 @@ class SolarEventCalculator
       return nil
     end
 
-    sunLocalHour = compute_sunrise_local_hour_angle(cosineSunLocalHour)
-    localMeanTime = compute_local_mean_time(sunTrueLong, longHour, riseLongHour, sunLocalHour)
+    sunLocalHour = compute_local_hour_angle(cosineSunLocalHour, isSunrise)
+    localMeanTime = compute_local_mean_time(sunTrueLong, longHour, eventLongHour, sunLocalHour)
 
     timeParts = localMeanTime.to_s('F').split('.')
     mins = BigDecimal.new("." + timeParts[1]) * BigDecimal.new("60")
@@ -135,27 +126,36 @@ class SolarEventCalculator
     Time.gm(@date.year, @date.mon, @date.mday, hours, pad_minutes(mins.to_i))
   end
 
-  def compute_utc_sunset(zenith)
-    longHour = compute_longitude_hour
-    setLongHour = compute_set_longitude_hour
+  def compute_utc_civil_sunrise
+    compute_utc_solar_event(96, true)
+  end
 
-    meanAnomaly = compute_sun_mean_anomaly(setLongHour)
-    sunTrueLong = compute_sun_true_longitude(meanAnomaly)
-    cosineSunLocalHour = compute_cosine_sun_local_hour(sunTrueLong, zenith)
+  def compute_utc_civil_sunset
+    compute_utc_solar_event(96, false)
+  end
 
-    if(cosineSunLocalHour > BigDecimal.new("1") || cosineSunLocalHour < BigDecimal.new("-1"))
-      return nil
-    end
+  def compute_utc_official_sunrise
+    compute_utc_solar_event(90.8333, true)
+  end
 
-    sunLocalHour = compute_sunset_local_hour_angle(cosineSunLocalHour)
-    localMeanTime = compute_local_mean_time(sunTrueLong, longHour, setLongHour, sunLocalHour)
+  def compute_utc_official_sunset
+    compute_utc_solar_event(90.8333, false)
+  end
 
-    timeParts = localMeanTime.to_s('F').split('.')
-    mins = BigDecimal.new("." + timeParts[1]) * BigDecimal.new("60")
-    mins = mins.truncate()
-    hours = timeParts[0]
+  def compute_utc_nautical_sunrise
+    compute_utc_solar_event(102, true)
+  end
 
-    Time.gm(@date.year, @date.mon, @date.mday, hours, pad_minutes(mins.to_i))
+  def compute_utc_nautical_sunset
+    compute_utc_solar_event(102, false)
+  end
+
+  def compute_utc_astronomical_sunrise
+    compute_utc_solar_event(108, true)
+  end
+
+  def compute_utc_astronomical_sunset
+    compute_utc_solar_event(108, false)
   end
 
   def pad_minutes(minutes)

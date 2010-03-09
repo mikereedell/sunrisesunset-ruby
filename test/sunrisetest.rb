@@ -1,4 +1,4 @@
-require 'sunrise'
+require '../lib/solareventcalculator'
 
 describe SolarEventCalculator, "test the math for home" do
 
@@ -8,11 +8,11 @@ describe SolarEventCalculator, "test the math for home" do
   end
 
   it "returns correct longitude hour" do
-    @calc.compute_longitude_hour.should eql(BigDecimal.new("-5.0523"))
+    @calc.compute_lnghour.should eql(BigDecimal.new("-5.0523"))
   end
 
   it "returns correct longitude hour" do
-    @calc.compute_rise_longitude_hour.should eql(BigDecimal.new("306.4605"))
+    @calc.compute_longitude_hour(true).should eql(BigDecimal.new("306.4605"))
   end
 
   it "returns correct sunrise mean anomaly" do
@@ -44,7 +44,7 @@ describe SolarEventCalculator, "test the math for home" do
   end
 
   it "returns correct sunrise local hour angle" do
-    @calc.compute_sunrise_local_hour_angle(BigDecimal.new("0.0791")).should eql(BigDecimal.new("18.3025"))
+    @calc.compute_local_hour_angle(BigDecimal.new("0.0791"), true).should eql(BigDecimal.new("18.3025"))
   end
 
   it "returns correct sunrise local mean time" do
@@ -56,19 +56,19 @@ describe SolarEventCalculator, "test the math for home" do
   end
 
   it "returns correct civil sunrise time" do
-    @calc.compute_utc_sunrise(96).should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 4))
+    @calc.compute_utc_civil_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 4))
   end
 
   it "returns correct official sunrise time" do
-    @calc.compute_utc_sunrise(90.8333).should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 33))
+    @calc.compute_utc_official_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 33))
   end
 
   it "returns correct nautical sunrise time" do
-    @calc.compute_utc_sunrise(102).should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 32))
+    @calc.compute_utc_nautical_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 32))
   end
 
   it "returns correct astronomical sunrise time" do
-    @calc.compute_utc_sunrise(108).should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 1))
+    @calc.compute_utc_astronomical_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 1))
   end
 end
 
@@ -77,13 +77,12 @@ describe SolarEventCalculator, "test the math for areas where there could be no 
   it "returns correct time" do
     date = Date.parse('2008-04-25') #25 April 2008
     calc = SolarEventCalculator.new(date, BigDecimal.new("64.8378"), BigDecimal.new("-147.7164"))
-    calc.compute_utc_sunrise(108).should eql(nil)
+    calc.compute_utc_nautical_sunrise.should eql(nil)
   end
 
   it "returns correct time" do
     date = Date.parse('2008-04-25') #25 April 2008
     calc = SolarEventCalculator.new(date, BigDecimal.new("64.8378"), BigDecimal.new("-147.7164"))
-    calc.compute_utc_sunrise(102).should eql(nil)
+    calc.compute_utc_nautical_sunrise.should eql(nil)
   end
 end
-
