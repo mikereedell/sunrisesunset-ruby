@@ -14,7 +14,7 @@ Handles the condition of no sunrise/sunset (Alaska in summer/winter) by returnin
 
 == DEPENDENCIES:
 
-None.
+Ruby Sunrise depends on the 'tzinfo' gem for localizing the computed sunrise/sunset times.
 
 == INSTALL:
 
