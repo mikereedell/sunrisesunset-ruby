@@ -1,5 +1,6 @@
 require 'bigdecimal'
 require 'date'
+require 'tzinfo'
 
 class SolarEventCalculator
 
@@ -123,7 +124,7 @@ class SolarEventCalculator
     mins = pad_minutes(mins.to_i)
     hours = timeParts[0]
 
-    Time.gm(@date.year, @date.mon, @date.mday, hours, pad_minutes(mins.to_i))
+    Time.utc(@date.year, @date.mon, @date.mday, hours, pad_minutes(mins.to_i))
   end
 
   def compute_utc_civil_sunrise
@@ -156,6 +157,54 @@ class SolarEventCalculator
 
   def compute_utc_astronomical_sunset
     compute_utc_solar_event(108, false)
+  end
+
+  def compute_civil_sunrise(timezone)
+    put_in_timezone(compute_utc_civil_sunrise, timezone)
+  end
+
+  def compute_civil_sunset(timezone)
+    put_in_timezone(compute_utc_civil_sunset, timezone)
+  end
+
+  def compute_official_sunrise(timezone)
+    put_in_timezone(compute_utc_official_sunrise, timezone)
+  end
+
+  def compute_official_sunset(timezone)
+    put_in_timezone(compute_utc_official_sunset, timezone)
+  end
+
+  def compute_nautical_sunrise(timezone)
+    put_in_timezone(compute_utc_nautical_sunrise, timezone)
+  end
+
+  def compute_nautical_sunset(timezone)
+    put_in_timezone(compute_utc_nautical_sunset, timezone)
+  end
+
+  def compute_astronomical_sunrise(timezone)
+    put_in_timezone(compute_utc_astronomical_sunrise, timezone)
+  end
+
+  def compute_astronomical_sunset(timezone)
+    put_in_timezone(compute_utc_astronomical_sunset, timezone)
+  end
+
+  def put_in_timezone(utcTime, timezone)
+    tz = TZInfo::Timezone.get(timezone)
+    noonUTC = Time.gm(@date.year, @date.mon, @date.mday, 12, 0)
+    noonLocal = tz.utc_to_local(noonUTC)
+    offset = noonLocal - noonUTC
+
+    local = utcTime + get_utc_offset(timezone)
+    Time.parse("#{@date.strftime('%a %b %d')} #{local.strftime(' %H:%M:%S')} #{offset} #{@date.year}")
+  end
+
+  def get_utc_offset(timezone)
+    tz = TZInfo::Timezone.get(timezone)
+    noonUTC = Time.gm(@date.year, @date.mon, @date.mday, 12, 0)
+    tz.utc_to_local(noonUTC) - noonUTC
   end
 
   def pad_minutes(minutes)

@@ -70,6 +70,22 @@ describe SolarEventCalculator, "test the math for home" do
   it "returns correct astronomical sunrise time" do
     @calc.compute_utc_astronomical_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 1))
   end
+
+  it "returns correct 'America/New_York' official sunrise time" do
+    @calc.compute_official_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 7, 33))
+  end
+
+  it "returns correct 'America/New_York' civil sunrise time" do
+    @calc.compute_civil_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 7, 4))
+  end
+
+  it "returns correct 'America/New_York' nautical sunrise time" do
+    @calc.compute_nautical_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 6, 32))
+  end
+
+  it "returns correct 'America/New_York' astronomical sunrise time" do
+    @calc.compute_astronomical_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 6, 1))
+  end
 end
 
 describe SolarEventCalculator, "test the math for areas where there could be no rise/set" do

@@ -3,7 +3,7 @@ require '../lib/solareventcalculator'
 describe SolarEventCalculator, "Test the sunset algorithm" do
 
   before do
-    @date = Date.parse('2008-11-01') #01 November 2008
+    @date = Date.parse('2008-11-01') #01 November 2008 (DST)
     @calc = SolarEventCalculator.new(@date, BigDecimal.new("39.9537"), BigDecimal.new("-75.7850"))
   end
 
@@ -55,21 +55,38 @@ describe SolarEventCalculator, "Test the sunset algorithm" do
     @calc.compute_local_mean_time(trueLong, longHour, t, localHour).should eql(BigDecimal.new("22.4675"))
   end
 
-  it "returns correct civil sunset time" do
+  it "returns correct UTC civil sunset time" do
     @calc.compute_utc_civil_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 22, 28))
   end
 
-  it "returns correct official sunset time" do
+  it "returns correct UTC official sunset time" do
     @calc.compute_utc_official_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 21, 59))
   end
 
-  it "returns correct nautical sunset time" do
+  it "returns correct UTC nautical sunset time" do
     @calc.compute_utc_nautical_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 0))
   end
 
-  it "returns correct astronomical sunset time" do
+  it "returns correct UTC astronomical sunset time" do
     @calc.compute_utc_astronomical_sunset.should eql(Time.gm(@date.year, @date.mon, @date.mday, 23, 31))
   end
+
+  it "returns correct 'America/New_York' offical sunset time" do
+    @calc.compute_official_sunset("America/New_York").should eql(Time.local(@date.year, @date.mon, @date.mday, 17, 59))
+  end
+
+  it "returns correct 'America/New_York' civil sunset time" do
+    @calc.compute_civil_sunset("America/New_York").should eql(Time.local(@date.year, @date.mon, @date.mday, 18, 28))
+  end
+
+  it "returns correct 'America/New_York' nautical sunset time" do
+    @calc.compute_nautical_sunset("America/New_York").should eql(Time.local(@date.year, @date.mon, @date.mday, 19, 00))
+  end
+
+  it "returns correct 'America/New_York' astronomical sunset time" do
+    @calc.compute_astronomical_sunset("America/New_York").should eql(Time.local(@date.year, @date.mon, @date.mday, 19, 31))
+  end
+  # 18:00,18:28,19:00,19:32
 end
 
 describe SolarEventCalculator, "test the math for areas where the sun doesn't set" do
