@@ -128,77 +128,85 @@ class SolarEventCalculator
   end
 
   def compute_utc_civil_sunrise
-    compute_utc_solar_event(96, true)
+    convert_to_datetime(compute_utc_solar_event(96, true))
   end
 
   def compute_utc_civil_sunset
-    compute_utc_solar_event(96, false)
+    convert_to_datetime(compute_utc_solar_event(96, false))
   end
 
   def compute_utc_official_sunrise
-    compute_utc_solar_event(90.8333, true)
+    convert_to_datetime(compute_utc_solar_event(90.8333, true))
   end
 
   def compute_utc_official_sunset
-    compute_utc_solar_event(90.8333, false)
+    convert_to_datetime(compute_utc_solar_event(90.8333, false))
   end
 
   def compute_utc_nautical_sunrise
-    compute_utc_solar_event(102, true)
+    convert_to_datetime(compute_utc_solar_event(102, true))
   end
 
   def compute_utc_nautical_sunset
-    compute_utc_solar_event(102, false)
+    convert_to_datetime(compute_utc_solar_event(102, false))
   end
 
   def compute_utc_astronomical_sunrise
-    compute_utc_solar_event(108, true)
+    convert_to_datetime(compute_utc_solar_event(108, true))
   end
 
   def compute_utc_astronomical_sunset
-    compute_utc_solar_event(108, false)
+    convert_to_datetime(compute_utc_solar_event(108, false))
+  end
+
+  def convert_to_datetime(time)
+    DateTime.parse("#{@date.strftime}T#{time.hour}:#{time.min}:00+0000") unless time == nil
   end
 
   def compute_civil_sunrise(timezone)
-    put_in_timezone(compute_utc_civil_sunrise, timezone)
+    put_in_timezone(compute_utc_solar_event(96, true), timezone)
   end
 
   def compute_civil_sunset(timezone)
-    put_in_timezone(compute_utc_civil_sunset, timezone)
+    put_in_timezone(compute_utc_solar_event(96, false), timezone)
   end
 
   def compute_official_sunrise(timezone)
-    put_in_timezone(compute_utc_official_sunrise, timezone)
+    put_in_timezone(compute_utc_solar_event(90.8333, true), timezone)
   end
 
   def compute_official_sunset(timezone)
-    put_in_timezone(compute_utc_official_sunset, timezone)
+    put_in_timezone(compute_utc_solar_event(90.8333, false), timezone)
   end
 
   def compute_nautical_sunrise(timezone)
-    put_in_timezone(compute_utc_nautical_sunrise, timezone)
+    put_in_timezone(compute_utc_solar_event(102, true), timezone)
   end
 
   def compute_nautical_sunset(timezone)
-    put_in_timezone(compute_utc_nautical_sunset, timezone)
+    put_in_timezone(compute_utc_solar_event(102, false), timezone)
   end
 
   def compute_astronomical_sunrise(timezone)
-    put_in_timezone(compute_utc_astronomical_sunrise, timezone)
+    put_in_timezone(compute_utc_solar_event(108, true), timezone)
   end
 
   def compute_astronomical_sunset(timezone)
-    put_in_timezone(compute_utc_astronomical_sunset, timezone)
+    put_in_timezone(compute_utc_solar_event(108, false), timezone)
   end
 
   def put_in_timezone(utcTime, timezone)
     tz = TZInfo::Timezone.get(timezone)
-    noonUTC = Time.gm(@date.year, @date.mon, @date.mday, 12, 0)
-    noonLocal = tz.utc_to_local(noonUTC)
-    offset = noonLocal - noonUTC
-
+    # puts "UTCTime #{utcTime}"
     local = utcTime + get_utc_offset(timezone)
-    Time.parse("#{@date.strftime('%a %b %d')} #{local.strftime(' %H:%M:%S')} #{offset} #{@date.year}")
+    # puts "LocalTime #{local}"
+
+    offset = (get_utc_offset(timezone) / 60 / 60).to_i
+    offset = (offset > 0) ? "+" + offset.to_s : offset.to_s
+
+    timeInZone = DateTime.parse("#{@date.strftime}T#{local.strftime('%H:%M:%S')}#{offset}")
+    # puts "CALC:timeInZone #{timeInZone}"
+    timeInZone
   end
 
   def get_utc_offset(timezone)

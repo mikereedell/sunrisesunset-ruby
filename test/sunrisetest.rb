@@ -55,36 +55,36 @@ describe SolarEventCalculator, "test the math for home" do
     @calc.compute_local_mean_time(trueLong, longHour, t, localHour).should eql(BigDecimal.new("11.0818"))
   end
 
-  it "returns correct civil sunrise time" do
-    @calc.compute_utc_civil_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 4))
+  it "returns correct UTC civil sunrise time" do
+    @calc.compute_utc_civil_sunrise.should eql(DateTime.parse("#{@date.strftime}T11:04:00-00:00"))
   end
 
-  it "returns correct official sunrise time" do
-    @calc.compute_utc_official_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 11, 33))
+  it "returns correct UTC official sunrise time" do
+    @calc.compute_utc_official_sunrise.should eql(DateTime.parse("#{@date.strftime}T11:33:00-00:00"))
   end
 
-  it "returns correct nautical sunrise time" do
-    @calc.compute_utc_nautical_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 32))
+  it "returns correct UTC nautical sunrise time" do
+    @calc.compute_utc_nautical_sunrise.should eql(DateTime.parse("#{@date.strftime}T10:32:00-00:00"))
   end
 
-  it "returns correct astronomical sunrise time" do
-    @calc.compute_utc_astronomical_sunrise.should eql(Time.gm(@date.year, @date.mon, @date.mday, 10, 1))
+  it "returns correct UTC astronomical sunrise time" do
+    @calc.compute_utc_astronomical_sunrise.should eql(DateTime.parse("#{@date.strftime}T10:01:00-00:00"))
   end
 
   it "returns correct 'America/New_York' official sunrise time" do
-    @calc.compute_official_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 7, 33))
+    @calc.compute_official_sunrise('America/New_York').should eql(DateTime.parse("#{@date.strftime}T07:33:00-04:00"))
   end
 
   it "returns correct 'America/New_York' civil sunrise time" do
-    @calc.compute_civil_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 7, 4))
+    @calc.compute_civil_sunrise('America/New_York').should eql(DateTime.parse("#{@date.strftime}T07:04:00-04:00"))
   end
 
   it "returns correct 'America/New_York' nautical sunrise time" do
-    @calc.compute_nautical_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 6, 32))
+    @calc.compute_nautical_sunrise('America/New_York').should eql(DateTime.parse("#{@date.strftime}T06:32:00-04:00"))
   end
 
   it "returns correct 'America/New_York' astronomical sunrise time" do
-    @calc.compute_astronomical_sunrise('America/New_York').should eql(Time.local(@date.year, @date.mon, @date.mday, 6, 1))
+    @calc.compute_astronomical_sunrise('America/New_York').should eql(DateTime.parse("#{@date.strftime}T06:01:00-04:00"))
   end
 end
 
