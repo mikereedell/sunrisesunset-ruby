@@ -118,7 +118,7 @@ class SolarEventCalculator
     sunLocalHour = compute_local_hour_angle(cosineSunLocalHour, isSunrise)
     localMeanTime = compute_local_mean_time(sunTrueLong, longHour, eventLongHour, sunLocalHour)
 
-    timeParts = localMeanTime.to_s('F').split('.')
+    timeParts = localMeanTime.to_f.to_s.split('.')
     mins = BigDecimal.new("." + timeParts[1]) * BigDecimal.new("60")
     mins = mins.truncate()
     mins = pad_minutes(mins.to_i)
