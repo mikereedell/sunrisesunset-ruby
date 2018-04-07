@@ -160,7 +160,8 @@ class SolarEventCalculator
   end
 
   def convert_to_datetime(time)
-    DateTime.parse("#{@date.strftime}T#{time.hour}:#{time.min}:00+0000") unless time == nil
+    return unless time
+    DateTime.parse("#{@date.strftime}T#{time.hour}:#{time.min}:00+0000")
   end
 
   def compute_civil_sunrise(timezone)
