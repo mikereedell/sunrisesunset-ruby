@@ -1,6 +1,6 @@
-require '../lib/solareventcalculator'
+require "spec_helper"
 
-describe SolarEventCalculator, "test the math for home" do
+RSpec.describe SolarEventCalculator, "test the math for home" do
 
   before do
     @date = Date.parse('2008-11-01') #01 November 2008

@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require "ruby_sunrise/identity"
+
 require 'bigdecimal'
 require 'date'
 require 'tzinfo'

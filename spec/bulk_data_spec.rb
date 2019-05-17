@@ -1,6 +1,6 @@
-require '../lib/solareventcalculator'
+require "spec_helper"
 
-describe SolarEventCalculator, "Test the sunset algorithm" do
+RSpec.describe SolarEventCalculator, "Test the sunset algorithm" do
 
   it "returns correct sunrise/sunset data over a year" do
     Dir.glob("*.txt") do | dataFileName |
