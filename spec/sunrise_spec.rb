@@ -5,11 +5,11 @@ RSpec.describe SolarEventCalculator, "test the math for home" do
   let(:date) { Date.parse("2008-11-01") }
 
   it "returns correct longitude hour" do
-    expect(calculator.compute_lnghour).to eql(BigDecimal("-5.0523"))
+    expect(calculator.compute_longitude_hour).to eql(BigDecimal("-5.0523"))
   end
 
-  it "returns correct longitude hour" do
-    expect(calculator.compute_longitude_hour(true)).to eql(BigDecimal("306.4605"))
+  it "returns correct longitude event hour" do
+    expect(calculator.compute_longitude_event_hour(true)).to eql(BigDecimal("306.4605"))
   end
 
   it "returns correct sunrise mean anomaly" do
@@ -25,7 +25,7 @@ RSpec.describe SolarEventCalculator, "test the math for home" do
   end
 
   it "returns correct sunrise's right ascension quadrant" do
-    expect(calculator.put_ra_in_correct_quadrant(BigDecimal("219.6960"))).to eql(BigDecimal("14.4865"))
+    expect(calculator.correct_quadrant_for_right_ascension(BigDecimal("219.6960"))).to eql(BigDecimal("14.4865"))
   end
 
   it "returns correct sunrise sin sun declination" do
