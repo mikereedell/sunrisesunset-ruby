@@ -1,7 +1,6 @@
 require "spec_helper"
 
 RSpec.describe SolarEventCalculator, "Test the sunset algorithm" do
-
   it "returns correct sunrise/sunset data over a year" do
     Dir.glob("*.txt") do | dataFileName |
     puts dataFileName
@@ -82,7 +81,7 @@ def get_utc_offset(date, timezone)
   offset = (offset  > 0) ? "+" + offset.to_s : offset.to_s
 end
 
-Spec::Matchers.define :be_close_to do |expected, type|
+RSpec::Matchers.define :be_close_to do |expected, type|
   match do |actual|
     if expected != nil && actual != nil
       (expected - 61) < actual && actual < (expected + 61)
@@ -96,7 +95,6 @@ Spec::Matchers.define :be_close_to do |expected, type|
   end
 
   failure_message_for_should_not do |actual|
-
   end
 
   description do
