@@ -11,64 +11,64 @@ class SolarEventCalculator
   end
 
   def compute_lnghour
-    lngHour = @longitude / BigDecimal.new("15")
+    lngHour = @longitude / BigDecimal("15")
     lngHour.round(4)
   end
 
   def compute_longitude_hour(isSunrise)
-    minuend = (isSunrise) ? BigDecimal.new("6") : BigDecimal.new("18")
-    longHour = @date.yday + ((minuend - compute_lnghour) / BigDecimal.new("24"))
+    minuend = (isSunrise) ? BigDecimal("6") : BigDecimal("18")
+    longHour = @date.yday + ((minuend - compute_lnghour) / BigDecimal("24"))
     longHour.round(4)
   end
 
   def compute_sun_mean_anomaly(longHour)
-    constant = BigDecimal.new("0.9856")
-    ((longHour * constant) - BigDecimal.new("3.289")).round(4)
+    constant = BigDecimal("0.9856")
+    ((longHour * constant) - BigDecimal("3.289")).round(4)
   end
 
   def compute_sun_true_longitude(meanAnomaly)
     mAsRads = degrees_as_rads(meanAnomaly)
-    sinM = BigDecimal.new(Math.sin(mAsRads.to_f).to_s)
-    sinTwoM = BigDecimal.new(Math.sin((2 * mAsRads).to_f).to_s)
-    firstParens = BigDecimal.new("1.916") * sinM
-    secondParens = BigDecimal.new("0.020") * sinTwoM
-    trueLong = meanAnomaly + firstParens + secondParens + BigDecimal.new("282.634")
+    sinM = BigDecimal(Math.sin(mAsRads.to_f).to_s)
+    sinTwoM = BigDecimal(Math.sin((2 * mAsRads).to_f).to_s)
+    firstParens = BigDecimal("1.916") * sinM
+    secondParens = BigDecimal("0.020") * sinTwoM
+    trueLong = meanAnomaly + firstParens + secondParens + BigDecimal("282.634")
     trueLong = put_in_range(trueLong, 0, 360, 360)
     trueLong.round(4)
   end
 
   def compute_right_ascension(sunTrueLong)
-    tanL = BigDecimal.new(Math.tan(degrees_as_rads(sunTrueLong).to_f).to_s)
-    ra = rads_as_degrees(BigDecimal.new(Math.atan(BigDecimal.new("0.91764") * tanL).to_s))
+    tanL = BigDecimal(Math.tan(degrees_as_rads(sunTrueLong).to_f).to_s)
+    ra = rads_as_degrees(BigDecimal(Math.atan(BigDecimal("0.91764") * tanL).to_s))
 
     ra = put_in_range(ra, 0, 360, 360)
     ra.round(4)
   end
 
   def put_ra_in_correct_quadrant(sunTrueLong)
-    lQuadrant = BigDecimal.new("90") * (sunTrueLong / BigDecimal.new("90")).floor
-    raQuadrant = BigDecimal.new("90") * (compute_right_ascension(sunTrueLong) / BigDecimal.new("90")).floor
+    lQuadrant = BigDecimal("90") * (sunTrueLong / BigDecimal("90")).floor
+    raQuadrant = BigDecimal("90") * (compute_right_ascension(sunTrueLong) / BigDecimal("90")).floor
 
     ra = compute_right_ascension(sunTrueLong) + (lQuadrant - raQuadrant)
-    ra = ra / BigDecimal.new("15")
+    ra = ra / BigDecimal("15")
     ra.round(4)
   end
 
   def compute_sin_sun_declination(sunTrueLong)
-    sinL = BigDecimal.new(Math.sin(degrees_as_rads(sunTrueLong).to_f).to_s)
-    sinDec = sinL * BigDecimal.new("0.39782")
+    sinL = BigDecimal(Math.sin(degrees_as_rads(sunTrueLong).to_f).to_s)
+    sinDec = sinL * BigDecimal("0.39782")
     sinDec.round(4)
   end
 
   def compute_cosine_sun_declination(sinSunDeclination)
-    cosDec = BigDecimal.new(Math.cos(Math.asin(sinSunDeclination)).to_s)
+    cosDec = BigDecimal(Math.cos(Math.asin(sinSunDeclination)).to_s)
     cosDec.round(4)
   end
 
   def compute_cosine_sun_local_hour(sunTrueLong, zenith)
-    cosZenith = BigDecimal.new(Math.cos(degrees_as_rads(BigDecimal.new(zenith.to_s))).to_s)
-    sinLatitude = BigDecimal.new(Math.sin(degrees_as_rads(@latitude)).to_s)
-    cosLatitude = BigDecimal.new(Math.cos(degrees_as_rads(@latitude)).to_s)
+    cosZenith = BigDecimal(Math.cos(degrees_as_rads(BigDecimal(zenith.to_s))).to_s)
+    sinLatitude = BigDecimal(Math.sin(degrees_as_rads(@latitude)).to_s)
+    cosLatitude = BigDecimal(Math.cos(degrees_as_rads(@latitude)).to_s)
 
     sinSunDeclination = compute_sin_sun_declination(sunTrueLong)
     top = cosZenith - (sinSunDeclination * sinLatitude)
@@ -79,11 +79,11 @@ class SolarEventCalculator
   end
 
   def compute_local_hour_angle(cosSunLocalHour, isSunrise)
-    acosH = BigDecimal.new(Math.acos(cosSunLocalHour).to_s)
+    acosH = BigDecimal(Math.acos(cosSunLocalHour).to_s)
     acosHDegrees = rads_as_degrees(acosH)
 
-    localHourAngle = (isSunrise) ? BigDecimal.new("360") - acosHDegrees : acosHDegrees
-    localHourAngle = localHourAngle / BigDecimal.new("15")
+    localHourAngle = (isSunrise) ? BigDecimal("360") - acosHDegrees : acosHDegrees
+    localHourAngle = localHourAngle / BigDecimal("15")
     localHourAngle.round(4)
   end
 
@@ -91,8 +91,8 @@ class SolarEventCalculator
     h = sunLocalHour
     ra = put_ra_in_correct_quadrant(sunTrueLong)
 
-    parens = BigDecimal.new("0.06571") * t
-    time = h + ra - parens - BigDecimal.new("6.622")
+    parens = BigDecimal("0.06571") * t
+    time = h + ra - parens - BigDecimal("6.622")
 
     utcTime = time - longHour
     utcTime = put_in_range(utcTime, 0, 24, 24)
@@ -107,7 +107,7 @@ class SolarEventCalculator
     sunTrueLong = compute_sun_true_longitude(meanAnomaly)
     cosineSunLocalHour = compute_cosine_sun_local_hour(sunTrueLong, zenith)
 
-    if(cosineSunLocalHour > BigDecimal.new("1") || cosineSunLocalHour < BigDecimal.new("-1"))
+    if(cosineSunLocalHour > BigDecimal("1") || cosineSunLocalHour < BigDecimal("-1"))
       return nil
     end
 
@@ -115,7 +115,7 @@ class SolarEventCalculator
     localMeanTime = compute_local_mean_time(sunTrueLong, longHour, eventLongHour, sunLocalHour)
 
     timeParts = localMeanTime.to_f.to_s.split('.')
-    mins = BigDecimal.new("." + timeParts[1]) * BigDecimal.new("60")
+    mins = BigDecimal("." + timeParts[1]) * BigDecimal("60")
     mins = mins.truncate()
     mins = pad_minutes(mins.to_i)
     hours = timeParts[0]
@@ -231,13 +231,14 @@ class SolarEventCalculator
 
   def degrees_as_rads(degrees)
     pi = BigDecimal(Math::PI.to_s)
-    radian = pi / BigDecimal.new("180")
+    radian = pi / BigDecimal("180")
     degrees * radian
   end
 
   def rads_as_degrees(radians)
     pi = BigDecimal(Math::PI.to_s)
-    degree = BigDecimal.new("180") / pi
+    degree = BigDecimal("180") / pi
     radians * degree
   end
+
 end
