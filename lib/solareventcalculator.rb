@@ -4,10 +4,6 @@ require 'tzinfo'
 
 class SolarEventCalculator
 
-  @date
-  @latitude
-  @longitude
-
   def initialize(date, latitude, longitude)
     @date = date
     @latitude = latitude
