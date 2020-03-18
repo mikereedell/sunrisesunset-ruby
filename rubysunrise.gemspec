@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do | s |
   s.name = "RubySunrise"
-  s.version = "0.3.1"
+  s.version = "0.3.2"
   s.author = "Mike Reedell / LuckyCatLabs"
   s.email = "mike@reedell.com"
   s.homepage = "http://www.mikereedell.com"
