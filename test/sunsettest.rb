@@ -63,6 +63,13 @@ describe SolarEventCalculator, "Test the sunset algorithm" do
     @calc.compute_utc_official_sunset.should eql(DateTime.parse("#{@date.strftime}T21:59:00-00:00"))
   end
 
+  it "returns correct UTC official sunset time for time zones in different days" do
+    date = Date.parse('2013-10-06') #06 October 2013 (MDT)
+    calc = SolarEventCalculator.new(date, BigDecimal.new("39.7643389"), BigDecimal.new("-104.8551114"))
+    # Sunset in CO is 18:34 on Oct, 6. In UTC time this should be 00:34 on Oct, 7
+    calc.compute_utc_official_sunset.should eql(DateTime.parse("#{date.next_day.strftime}T00:34:00+00:00"))
+  end
+
   it "returns correct UTC nautical sunset time" do
     @calc.compute_utc_nautical_sunset.should eql(DateTime.parse("#{@date.strftime}T23:00:00-00:00"))
   end
